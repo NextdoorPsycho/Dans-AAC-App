@@ -18,6 +18,7 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
   late TextEditingController pageNumberController;
   int currentPageIndex = 0;
   List<Guide> guides = [];
+  bool isNewGuide = false;
 
   @override
   void initState() {
@@ -36,16 +37,23 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
     super.dispose();
   }
 
-  void _addGuide() {
+  void _addOrUpdateGuide() {
     if (guideNameController.text.isNotEmpty) {
-      final newGuide = Guide(
-        id: UniqueKey().toString(),
-        name: guideNameController.text,
-        pages: [],
-      );
-      setState(() {
-        guides.add(newGuide);
-      });
+      if (isNewGuide) {
+        final newGuide = Guide(
+          id: UniqueKey().toString(),
+          name: guideNameController.text,
+          pages: [],
+        );
+        setState(() {
+          guides.add(newGuide);
+        });
+        isNewGuide = false;
+      } else {
+        setState(() {
+          guides[currentPageIndex].name = guideNameController.text;
+        });
+      }
       saveGuides();
     }
   }
@@ -64,6 +72,13 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
         saveGuides();
       }
     }
+  }
+
+  void _deleteGuide(int guideIndex) {
+    setState(() {
+      guides.removeAt(guideIndex);
+    });
+    saveGuides();
   }
 
   Future<void> saveGuides() async {
@@ -85,9 +100,7 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
     }
   }
 
-  void _openAddPageDrawer() {
-    currentPageIndex =
-        guides.length - 1; // Ensure we're on the last guide for editing
+  void _openAddOrUpdatePageDrawer() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -119,7 +132,7 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      _addGuide(); // Save the guide or page changes
+                      _addOrUpdateGuide();
                       Navigator.pop(context); // Close the modal bottom sheet
                     },
                     child: const Text('Save Guide'),
@@ -143,29 +156,37 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
         itemCount: guides.length + 1, // +1 for the add button
         itemBuilder: (context, index) {
           if (index == guides.length) {
-            // The add button at the end of the list
             return ListTile(
               leading: const Icon(Icons.add),
               title: const Text('Create New Guide'),
               onTap: () {
-                _openAddPageDrawer();
+                guideNameController
+                    .clear(); // Clear the controller for new guide creation
+                isNewGuide = true;
+                _openAddOrUpdatePageDrawer();
               },
             );
           }
           return ListTile(
             title: Text(guides[index].name),
+            leading: const Icon(Icons.book),
+            trailing: IconButton(
+              // Adding delete guide button here
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                _deleteGuide(index);
+              },
+            ),
             onTap: () {
-              // Set current page index to the tapped guide
-              setState(() {
-                currentPageIndex = index;
-                guideNameController.text = guides[index].name;
-                if (guides[index].pages.isNotEmpty) {
-                  pageTextController.text = guides[index].pages.first.text;
-                  pageNumberController.text =
-                      guides[index].pages.first.number.toString();
-                }
-              });
-              _openAddPageDrawer(); // Open the drawer to edit the selected guide
+              currentPageIndex = index;
+              guideNameController.text = guides[index].name;
+              if (guides[index].pages.isNotEmpty) {
+                pageTextController.text = guides[index].pages.first.text;
+                pageNumberController.text =
+                    guides[index].pages.first.number.toString();
+              }
+
+              _openAddOrUpdatePageDrawer();
             },
           );
         },
@@ -176,7 +197,8 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
           guideNameController.clear();
           pageTextController.clear();
           pageNumberController.clear();
-          _openAddPageDrawer(); // Open the drawer for a new guide
+          isNewGuide = true;
+          _openAddOrUpdatePageDrawer(); // Open the drawer for a new guide
         },
         child: Icon(Icons.add),
       ),
