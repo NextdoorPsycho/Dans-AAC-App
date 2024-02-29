@@ -43,34 +43,30 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
         final newGuide = Guide(
           id: UniqueKey().toString(),
           name: guideNameController.text,
-          pages: [],
+          pages: [
+            GuidePage(
+              text: pageTextController.text,
+              number: int.parse(pageNumberController.text),
+            )
+          ],
         );
         setState(() {
           guides.add(newGuide);
         });
         isNewGuide = false;
       } else {
+        GuidePage newPage = GuidePage(
+          text: pageTextController.text,
+          number: int.parse(pageNumberController.text),
+        );
+
         setState(() {
           guides[currentPageIndex].name = guideNameController.text;
+          guides[currentPageIndex].pages.add(newPage);
         });
       }
-      saveGuides();
-    }
-  }
 
-  void _addPageToCurrentGuide() {
-    if (pageTextController.text.isNotEmpty &&
-        pageNumberController.text.isNotEmpty) {
-      final page = GuidePage(
-        text: pageTextController.text,
-        number: int.tryParse(pageNumberController.text) ?? 0,
-      );
-      if (currentPageIndex < guides.length) {
-        setState(() {
-          guides[currentPageIndex].pages.add(page);
-        });
-        saveGuides();
-      }
+      saveGuides();
     }
   }
 
@@ -92,11 +88,22 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
     final prefs = await SharedPreferences.getInstance();
     final String? guidesJson = prefs.getString('guides');
     if (guidesJson != null) {
-      setState(() {
-        guides = (json.decode(guidesJson) as List)
-            .map((guideJson) => Guide.fromJson(guideJson))
-            .toList();
-      });
+      final decodedJson = json.decode(guidesJson);
+      // Check if the decoded JSON is a Map and contains a key for guides
+      if (decodedJson is Map<String, dynamic> &&
+          decodedJson.containsKey('guides')) {
+        setState(() {
+          guides = (decodedJson['guides'] as List)
+              .map((guideJson) => Guide.fromJson(guideJson))
+              .toList();
+        });
+      } else if (decodedJson is List) {
+        setState(() {
+          guides = decodedJson
+              .map((guideJson) => Guide.fromJson(guideJson))
+              .toList();
+        });
+      }
     }
   }
 
@@ -120,7 +127,7 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
                   TextField(
                     controller: pageTextController,
                     decoration: const InputDecoration(
-                      labelText: 'Page Text',
+                      labelText: 'Some Text',
                     ),
                   ),
                   TextField(
@@ -162,6 +169,8 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
               onTap: () {
                 guideNameController
                     .clear(); // Clear the controller for new guide creation
+                pageTextController.clear();
+                pageNumberController.clear();
                 isNewGuide = true;
                 _openAddOrUpdatePageDrawer();
               },
@@ -172,7 +181,7 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
             leading: const Icon(Icons.book),
             trailing: IconButton(
               // Adding delete guide button here
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               onPressed: () {
                 _deleteGuide(index);
               },
@@ -181,26 +190,14 @@ class _GuidePageViewportState extends State<GuidePageViewport> {
               currentPageIndex = index;
               guideNameController.text = guides[index].name;
               if (guides[index].pages.isNotEmpty) {
-                pageTextController.text = guides[index].pages.first.text;
+                pageTextController.text = guides[index].pages.last.text;
                 pageNumberController.text =
-                    guides[index].pages.first.number.toString();
+                    guides[index].pages.last.number.toString();
               }
-
               _openAddOrUpdatePageDrawer();
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Reset controllers for adding a new guide
-          guideNameController.clear();
-          pageTextController.clear();
-          pageNumberController.clear();
-          isNewGuide = true;
-          _openAddOrUpdatePageDrawer(); // Open the drawer for a new guide
-        },
-        child: Icon(Icons.add),
       ),
     );
   }
