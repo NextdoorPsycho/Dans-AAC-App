@@ -1,6 +1,7 @@
-import 'package:dans_aac_app/screen/settings/home.dart';
-import 'package:dans_aac_app/screen/settings/library.dart';
-import 'package:dans_aac_app/screen/settings/settings.dart';
+import 'package:dans_aac_app/screen/guide.dart';
+import 'package:dans_aac_app/screen/home.dart';
+import 'package:dans_aac_app/screen/library.dart';
+import 'package:dans_aac_app/screen/settings.dart';
 import 'package:dans_aac_app/widget/inoperable/text.dart';
 import 'package:flutter/material.dart';
 
@@ -17,11 +18,13 @@ class _AggregatorState extends State<Aggregator> {
   Widget _getPageWidget(int index) {
     switch (index) {
       case 0:
-        return const HomePage();
+        return const HomeViewport();
       case 1:
-        return const LibraryPage();
+        return const LibraryViewport();
       case 2:
-        return const SettingsPage();
+        return const SettingsViewport();
+      case 3:
+        return const GuidePageViewport();
       default:
         throw UnimplementedError('no widget for $index');
     }
@@ -47,6 +50,10 @@ class _AggregatorState extends State<Aggregator> {
             BottomNavigationBarItem(
                 icon: const Icon(Icons.settings_outlined),
                 label: 'Settings',
+                backgroundColor: theme.primaryColor),
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.help_outline),
+                label: 'Guide',
                 backgroundColor: theme.primaryColor),
           ],
           currentIndex: selectedIndex,
@@ -78,6 +85,9 @@ class _AggregatorState extends State<Aggregator> {
               NavigationRailDestination(
                   icon: const Icon(Icons.settings_outlined),
                   label: basicSubtext("Settings", context)),
+              NavigationRailDestination(
+                  icon: const Icon(Icons.help_outline),
+                  label: basicSubtext("Guide", context)),
             ],
             selectedIndex: selectedIndex,
             onDestinationSelected: (value) =>

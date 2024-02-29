@@ -2,14 +2,14 @@ import 'package:dans_aac_app/widget/inoperable/basic_container.dart';
 import 'package:dans_aac_app/widget/inoperable/text.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class LibraryViewport extends StatefulWidget {
+  const LibraryViewport({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<LibraryViewport> createState() => _LibraryViewportState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _LibraryViewportState extends State<LibraryViewport> {
   late TextEditingController apiTokenController; // for the text field
 
   @override
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: basicTitle("Home Page", context),
+        title: basicTitle("Library Page", context),
         centerTitle: true,
         backgroundColor: colorScheme.primary,
       ),
@@ -46,8 +46,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildPage(BuildContext context) {
     return basicContainer(context, [
-      basicTitle("Home Page", context),
-      basicSubtext("This is the home page", context),
+      basicTitle("Library Page", context),
+      basicSubtext("This is the library page", context),
     ]);
   }
 }

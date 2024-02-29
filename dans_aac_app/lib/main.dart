@@ -1,4 +1,4 @@
-import 'package:dans_aac_app/screen/aggregator.dart';
+import 'package:dans_aac_app/aggregator.dart';
 import 'package:fast_log/fast_log.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

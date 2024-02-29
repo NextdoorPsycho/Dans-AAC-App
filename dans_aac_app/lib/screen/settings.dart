@@ -6,14 +6,14 @@ import 'package:dans_aac_app/widget/operable/button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+class SettingsViewport extends StatefulWidget {
+  const SettingsViewport({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<SettingsViewport> createState() => _SettingsViewportState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsViewportState extends State<SettingsViewport> {
   late TextEditingController apiTokenController; // for the text field
 
   @override
