@@ -1,6 +1,7 @@
 import 'package:dans_aac_app/model/app/app_data_model.dart';
 import 'package:dans_aac_app/widget/inoperable/basic_container.dart';
 import 'package:dans_aac_app/widget/inoperable/text.dart';
+import 'package:dans_aac_app/widget/notification/notification.dart';
 import 'package:dans_aac_app/widget/operable/button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -61,6 +62,9 @@ class _SettingsPageState extends State<SettingsPage> {
           onChanged: (bool value) {
             // Toggle theme logic here
             Provider.of<AppDataModel>(context, listen: false).toggleTheme();
+            genericNotification(context, "Toggled the theme!",
+                "I bet you like dark theme you dirty little vegetable.",
+                time: 3);
           },
           context: context)
     ]);
